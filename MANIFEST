@@ -1,0 +1,6 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Tie-Handle-HTTP.t
+lib/Tie/Handle/HTTP.pm
