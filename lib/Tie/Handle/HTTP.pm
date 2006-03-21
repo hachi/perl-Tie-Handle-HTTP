@@ -45,7 +45,7 @@ sub TIEHANDLE {
 
     my $self = bless {}, (ref $class || $class);
 
-    $self->{length} = undef; # = $res->header( 'Content-Length' );
+    $self->{length} = $res->header( 'Content-Length' );
     $self->{pos} = 0;
     $self->{ua} = $ua;
     $self->{uri} = $uri;
@@ -149,7 +149,7 @@ sub SEEK {
 
     $self->{pos} = $offset;
     $self->{eof} = 0;
-    return $offset;
+    return 1;
 }
 
 1;
