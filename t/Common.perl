@@ -37,6 +37,7 @@ sub readmatch {
 
         diag( "Got $bytes bytes: '$content'" ) if VERBOSE;
 
+        ok( $bytes, "Read success" );
         ok( $bytes == $length, "Read of $length succeeded" );
         ok( $content eq $string, "Read of string succeeded" );
     }
@@ -52,6 +53,7 @@ sub readmatch {
 
         diag( "Got $bytes bytes: '$content'" ) if VERBOSE;
 
+        ok( $bytes, "Read success" );
         ok( $bytes == $length, "Read of $length succeeded" );
         ok( $content eq $string, "Read of string succeeded" );
     }
