@@ -7,7 +7,6 @@ use LWP::UserAgent;
 use HTTP::Request;
 use HTTP::Status;
 use Errno qw(EIO EINVAL);
-use Data::Dumper;
 use Symbol;
 
 use vars qw($VERSION);
