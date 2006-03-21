@@ -1,23 +1,36 @@
 #!/usr/bin/perl
+# vim: filetype=perl
 
 use warnings;
 use strict;
 use Tie::Handle::HTTP;
 use Test::More 'no_plan'; # tests => 10;
 
+BEGIN {
+    my $flag = $ENV{VERBOSE} || 0;
+    eval "sub VERBOSE () { $flag }";
+}
+
 ok( tie( *FOO, 'Tie::Handle::HTTP', 'http://hachi.kuiki.net/stuff/test.txt' ), "Tie succeeded" );
 
 ok( tell( FOO ) == 0, "Start at 0" );
+ok( !eof( FOO), "Not at end of file, good" );
 readmatch( "Lorem ipsum dolor sit amet" );
+ok( !eof( FOO), "Not at end of file, good" );
 readmatch( ", consectetuer adipiscing elit" );
-seek( FOO, 0, 0 );
+ok( seek( FOO, 0, 0 ), "Seek success" );
 ok( tell( FOO ) == 0, "Seek to 0" );
 readmatch( "Lorem ipsum dolor sit amet" );
+ok( !eof( FOO), "Not at end of file, good" );
 readmatch( ", consectetuer adipiscing elit" );
+ok( !eof( FOO), "Not at end of file, good" );
 readmatch( ", sed diam nonummy nibh euismod tincidunt ut laoreet dolore magna aliquam erat volutpat." );
+ok( !eof( FOO), "Not at end of file, good" );
 
-my $string = "Eodem modo typi, qui nunc nobis videntur parum clari, fiant sollemnes in futurum.";
-seek( FOO, 0-length( $string ), 2 );
+my $string = "Eodem modo typi, qui nunc nobis videntur parum clari, fiant sollemnes in futurum.\n";
+ok( seek( FOO, 0-length( $string ), 2 ), "Seek success" );
+readmatch( $string );
+ok( eof( FOO ), "At end of file when we should be" );
 
 sub readmatch {
     my $string = shift;
@@ -26,26 +39,26 @@ sub readmatch {
     my $pos = tell( FOO );
 
     {
-        diag( "Requesting $length bytes: '$string'" );
+        diag( "Requesting $length bytes: '$string'" ) if VERBOSE;
 
         my $bytes = read( FOO, my $content, $length );
 
-        diag( "Got $bytes bytes: '$content'" );
+        diag( "Got $bytes bytes: '$content'" ) if VERBOSE;
 
         ok( $bytes == $length, "Read of $length succeeded" );
         ok( $content eq $string, "Read of string succeeded" );
     }
 
-    seek( FOO, 0-$length, 1 );
+    ok( seek( FOO, 0-$length, 1 ), "Seek success" );
 
     ok( tell( FOO ) == $pos, "seek took us back where we started: $pos" );
     
     {
-        diag( "Requesting $length bytes: '$string'" );
+        diag( "Requesting $length bytes: '$string'" ) if VERBOSE;
 
         my $bytes = read( FOO, my $content, $length );
 
-        diag( "Got $bytes bytes: '$content'" );
+        diag( "Got $bytes bytes: '$content'" ) if VERBOSE;
 
         ok( $bytes == $length, "Read of $length succeeded" );
         ok( $content eq $string, "Read of string succeeded" );
