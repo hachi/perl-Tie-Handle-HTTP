@@ -14,22 +14,16 @@ $VERSION = '0.02';
 
 sub DEBUGGING () { 0 }
 
-# This doesn't work, please don't fix it without telling me how.
-# sub open {
-#     my $class = shift;
-#     my $handle_ref = \$_[0]; shift;
-#     my $uri = shift;
-# 
-#     my $symbol = Symbol::gensym;
-# 
-#     tie( *$symbol, __PACKAGE__, $uri );
-# 
-#     if ($handle_ref eq 'SCALAR') {
-#         $$handle_ref = $symbol;
-#     } elsif ($handle_ref eq 'GLOB') {
-#         *$handle_ref = *$symbol;
-#     }
-# }
+sub new {
+    my $class = shift;
+    my $uri = shift;
+
+    my $symbol = Symbol::gensym;
+
+    tie( *$symbol, __PACKAGE__, $uri );
+
+    return $symbol;
+}
 
 sub TIEHANDLE {
     my $class = shift;
@@ -161,7 +155,10 @@ Tie::Handle::HTTP - Tie class for doing HTTP range requests for read calls.
 =head1 SYNOPSIS
 
   use Tie::Handle::HTTP;
-  tie *HANDLE, "http://example.com/largefile.ext";
+  
+  tie *HANDLE, "http://example.com/largefile";
+  # or
+  my $fh = Tie::Handle::HTTP->new( "http://example.com/largefile" );
 
   # Seek to 1 MB in the file
   seek HANDLE, 1024 * 1024, 0;
@@ -169,18 +166,28 @@ Tie::Handle::HTTP - Tie class for doing HTTP range requests for read calls.
   # Read 1 KB from the middle
   read HANDLE, my $buf, 1024;
   
-=head1 EXAMPLES
-
-Example code can be found in the 'examples' directory found in the tarball
-for this module. Fresh copies can be downloaded from CPAN if you are unable
-to find the examples in a vendor distribution.
-
 =head1 DESCRIPTION
 
 This module sets up a tied filehandle and associates it with a single HTTP
 address where each read on the filehandle will be performed as an HTTP Range
 request. Keepalives are used when possible, but requests will not be buffered
 in any way.
+
+=head1 METHODS
+
+=over 1
+
+=item Tie::Handle::HTTP->new( URI )
+
+Takes a single argument, a URI string to open. Returns a globref for a tied filehandle in this class.
+
+=back
+
+=head1 EXAMPLES
+
+Example code can be found in the 'examples' directory found in the tarball
+for this module. Fresh copies can be downloaded from CPAN if you are unable
+to find the examples in a vendor distribution.
 
 =head1 BUGS and LIMITATIONS
 
