@@ -10,7 +10,7 @@ use Errno qw(EIO EINVAL);
 use Symbol;
 
 use vars qw($VERSION);
-$VERSION = '0.01';
+$VERSION = '0.02';
 
 sub DEBUGGING () { 0 }
 
@@ -156,31 +156,38 @@ __END__
 
 =head1 NAME
 
-Tie::Handle::HTTP - Perl extension for blah blah blah
+Tie::Handle::HTTP - Tie class for doing HTTP range requests for read calls.
 
 =head1 SYNOPSIS
 
   use Tie::Handle::HTTP;
-  blah blah blah
+  tie *HANDLE, "http://example.com/largefile.ext";
+
+  # Seek to 1 MB in the file
+  seek HANDLE, 1024 * 1024, 0;
+
+  # Read 1 KB from the middle
+  read HANDLE, my $buf, 1024;
+  
+=head1 EXAMPLES
+
+Example code can be found in the 'examples' directory found in the tarball
+for this module. Fresh copies can be downloaded from CPAN if you are unable
+to find the examples in a vendor distribution.
 
 =head1 DESCRIPTION
 
-Stub documentation for Tie::Handle::HTTP, created by h2xs. It looks like the
-author of the extension was negligent enough to leave the stub
-unedited.
+This module sets up a tied filehandle and associates it with a single HTTP
+address where each read on the filehandle will be performed as an HTTP Range
+request. Keepalives are used when possible, but requests will not be buffered
+in any way.
 
-Blah blah blah.
+=head1 BUGS and LIMITATIONS
 
-=head1 SEE ALSO
+No buffering of any kind, may be added in future versions based on demand.
 
-Mention other useful documentation such as the documentation of
-related modules or operating system documentation (such as man pages
-in UNIX), or any relevant external documentation such as RFCs or
-standards.
-
-If you have a mailing list set up for your module, mention it here.
-
-If you have a web site set up for your module, mention it here.
+Scalar filehandle manipulation is not supported at this time, I'm not quite
+sure how to make it work.
 
 =head1 AUTHOR
 
